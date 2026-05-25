@@ -1,0 +1,103 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+    ADMIN
+    USER
+}
+
+enum Gender {
+    MALE
+    FEMALE
+}
+
+enum Goal {
+    BULKING
+    CUTTING
+    MAINTAINING
+}
+
+enum MealTime {
+    BREAKFAST
+    LUNCH
+    DINNER
+    SNACK
+}
+
+model User {
+    id        Int      @id @default(autoincrement())
+    email     String   @unique
+    password  String
+    role      Role
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    profile   Profile?
+    dailyLogs DailyLog[]
+
+    @@map("users")
+}
+
+model Profile {
+    id            Int      @id @default(autoincrement())
+    userId        Int      @unique @map("user_id")
+    gender        Gender
+    age           Int
+    weight        Decimal
+    height        Decimal
+    activityLevel Int      @map("activity_level")
+    goal          Goal
+    weightGoal    Decimal  @map("weight_goal")
+    calorieGoal   Decimal  @map("calorie_goal")
+    proteinGoal   Decimal  @map("protein_goal")
+    carbGoal      Decimal  @map("carb_goal")
+    fatGoal       Decimal  @map("fat_goal")
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("profiles")
+}
+
+model Food {
+    id        Int      @id @default(autoincrement())
+    name      String
+    calories  Decimal
+    protein   Decimal
+    carbs     Decimal
+    fat       Decimal
+    sugar     Decimal
+    natrium   Decimal
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    dailyLogs DailyLog[]
+
+    @@map("foods")
+}
+
+model DailyLog {
+    id        Int      @id @default(autoincrement())
+    userId    Int      @map("user_id")
+    foodId    Int      @map("food_id")
+    date      DateTime
+    mealTime  MealTime @map("meal_time")
+    consumtionGram Decimal   @map("consumtion_gram")
+    totalCalories Decimal   @map("total_calories")
+    totalProtein  Decimal   @map("total_protein")
+    totalCarbs    Decimal   @map("total_carbs")
+    totalFat      Decimal   @map("total_fat")
+    totalSugar    Decimal   @map("total_sugar")
+    totalNatrium  Decimal   @map("total_natrium")
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    food      Food     @relation(fields: [foodId], references: [id], onDelete: Cascade)
+
+    @@map("daily_logs")
+}
