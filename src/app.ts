@@ -1,23 +1,32 @@
-import express from "express"
-import authRoutes from "./routes/auth.route"
-import { errorHandler } from "./middlewares/error.middleware"
-import { swaggerDocs } from "./docs/swagger"
+import express from "express";
+import cors from "cors";
+import authRoutes from "./routes/auth.route";
+import { errorHandler } from "./middlewares/error.middleware";
+import { swaggerDocs } from "./docs/swagger";
 
-const app = express()
-app.use(express.json({ limit: "10mb" }))
-app.use(express.urlencoded({ limit: "10mb", extended: true }))
+const app = express();
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  }),
+);
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 if (process.env.ENVIRONMENT === "DEV") {
-    swaggerDocs(app)
+  swaggerDocs(app);
 }
 
 app.get("/", (req: express.Request, res: express.Response) => {
-    res.status(200).json({
-        message: "Welcome to NutroGO API"
-    })
-})
-app.use("/api/auth", authRoutes)
+  res.status(200).json({
+    message: "Welcome to NutroGO API",
+  });
+});
+app.use("/api/auth", authRoutes);
 
-app.use(errorHandler)
+app.use(errorHandler);
 
-export default app
+export default app;
