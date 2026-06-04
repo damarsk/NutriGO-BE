@@ -12,6 +12,7 @@ servers:
 
 tags:
   - name: Auth
+  - name: Food
 
 paths:
   # ================= AUTH =================
@@ -29,6 +30,10 @@ paths:
       responses:
         201:
           description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
         400:
           description: Bad request
 
@@ -45,6 +50,10 @@ paths:
       responses:
         200:
           description: User logged in successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
         400:
           description: Bad request
 
@@ -57,6 +66,51 @@ paths:
       responses:
         200:
           description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        401:
+          description: Unauthorized
+
+  # ================= FOOD =================
+
+  /api/foods:
+    get:
+      tags: [Food]
+      summary: Get all foods
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Foods retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FoodListResponse"
+        401:
+          description: Unauthorized
+
+    post:
+      tags: [Food]
+      summary: Create a new food
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateFoodRequest"
+      responses:
+        201:
+          description: Food created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FoodResponse"
+        400:
+          description: Bad request
         401:
           description: Unauthorized
 
@@ -74,8 +128,12 @@ components:
       properties:
         email:
           type: string
+          format: email
+          example: user@example.com
         password:
           type: string
+          minLength: 6
+          example: password123
 
     LoginRequest:
       type: object
@@ -83,5 +141,102 @@ components:
       properties:
         email:
           type: string
+          format: email
+          example: user@example.com
         password:
           type: string
+          minLength: 6
+          example: password123
+
+    AuthResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "User registered successfully"
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            email:
+              type: string
+            token:
+              type: string
+
+    CreateFoodRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          example: "Apple"
+        calories:
+          type: number
+          nullable: true
+          example: 52
+        carbs:
+          type: number
+          nullable: true
+          example: 14
+        fat:
+          type: number
+          nullable: true
+          example: 0.2
+        sugar:
+          type: number
+          nullable: true
+          example: 10
+        natrium:
+          type: number
+          nullable: true
+          example: 1
+
+    Food:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        calories:
+          type: number
+          nullable: true
+        carbs:
+          type: number
+          nullable: true
+        fat:
+          type: number
+          nullable: true
+        sugar:
+          type: number
+          nullable: true
+        natrium:
+          type: number
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    FoodResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Food created successfully"
+        data:
+          $ref: "#/components/schemas/Food"
+
+    FoodListResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Foods retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Food"

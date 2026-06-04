@@ -1,7 +1,7 @@
 {
   "name": "nutrigo-be",
   "version": "1.0.0",
-  "description": "Library API with Prisma + Express + Swagger",
+  "description": "NutriGO API with Prisma + Express + Swagger",
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev src/server.ts",
