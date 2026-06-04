@@ -3,10 +3,10 @@ import * as service from "../services/auth.service";
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const user = await service.register(req.body);
+    const result = await service.register(req.body);
     res.status(201).json({
       message: "User registered successfully",
-      data: user,
+      data: result,
     });
   } catch (err: any) {
     res

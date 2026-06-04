@@ -13,6 +13,7 @@ servers:
 tags:
   - name: Auth
   - name: Food
+  - name: Profile
 
 paths:
   # ================= AUTH =================
@@ -33,9 +34,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthResponse"
+                $ref: "#/components/schemas/AuthTokenResponse"
         400:
           description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/auth/login:
     post:
@@ -53,9 +58,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthResponse"
+                $ref: "#/components/schemas/AuthTokenResponse"
         400:
           description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/auth/me:
     get:
@@ -69,9 +78,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthResponse"
+                $ref: "#/components/schemas/MeResponse"
+        400:
+          description: Failed to fetch user info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         401:
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   # ================= FOOD =================
 
@@ -88,8 +107,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/FoodListResponse"
+        400:
+          description: Failed to get foods
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         401:
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
     post:
       tags: [Food]
@@ -111,8 +140,106 @@ paths:
                 $ref: "#/components/schemas/FoodResponse"
         400:
           description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         401:
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ================= PROFILE =================
+
+  /api/profile:
+    get:
+      tags: [Profile]
+      summary: Get current user profile
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileResponse"
+        400:
+          description: Failed to get profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    post:
+      tags: [Profile]
+      summary: Create current user profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProfileRequest"
+      responses:
+        201:
+          description: Profile created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileResponse"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    put:
+      tags: [Profile]
+      summary: Update current user profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileRequest"
+      responses:
+        200:
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileResponse"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
 components:
   securitySchemes:
@@ -124,8 +251,11 @@ components:
   schemas:
     RegisterRequest:
       type: object
-      required: [email, password]
+      required: [fullName, email, password]
       properties:
+        fullName:
+          type: string
+          example: "John Doe"
         email:
           type: string
           format: email
@@ -148,25 +278,51 @@ components:
           minLength: 6
           example: password123
 
-    AuthResponse:
+    AuthUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        role:
+          type: string
+          enum: [ADMIN, USER]
+          example: USER
+
+    AuthTokenData:
+      type: object
+      properties:
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        user:
+          $ref: "#/components/schemas/AuthUser"
+
+    AuthTokenResponse:
       type: object
       properties:
         message:
           type: string
-          example: "User registered successfully"
+          example: "Login successful"
         data:
-          type: object
-          properties:
-            id:
-              type: string
-            email:
-              type: string
-            token:
-              type: string
+          $ref: "#/components/schemas/AuthTokenData"
+
+    MeResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "User info fetched successfully"
+        data:
+          $ref: "#/components/schemas/AuthUser"
 
     CreateFoodRequest:
       type: object
-      required: [name]
+      required: [name, calories, carbs, fat, sugar, natrium]
       properties:
         name:
           type: string
@@ -183,6 +339,10 @@ components:
           type: number
           nullable: true
           example: 0.2
+        protein:
+          type: number
+          nullable: true
+          example: 0.3
         sugar:
           type: number
           nullable: true
@@ -196,7 +356,7 @@ components:
       type: object
       properties:
         id:
-          type: string
+          type: integer
         name:
           type: string
         calories:
@@ -206,6 +366,9 @@ components:
           type: number
           nullable: true
         fat:
+          type: number
+          nullable: true
+        protein:
           type: number
           nullable: true
         sugar:
@@ -240,3 +403,135 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Food"
+
+    CreateProfileRequest:
+      type: object
+      required: [age, height, weight, gender, activityLevel, goal]
+      properties:
+        age:
+          type: integer
+          minimum: 1
+          example: 25
+        height:
+          type: number
+          minimum: 1
+          example: 170
+        weight:
+          type: number
+          minimum: 1
+          example: 65
+        gender:
+          type: string
+          enum: [MALE, FEMALE]
+          example: MALE
+        activityLevel:
+          type: string
+          enum: [SEDENTARY, MODERATE, VERY_ACTIVE]
+          example: MODERATE
+        goal:
+          type: string
+          enum: [LOSE_WEIGHT, MAINTAIN_WEIGHT, GAIN_WEIGHT]
+          example: MAINTAIN_WEIGHT
+
+    UpdateProfileRequest:
+      type: object
+      properties:
+        age:
+          type: integer
+          minimum: 1
+          example: 26
+        height:
+          type: number
+          minimum: 1
+          example: 171
+        weight:
+          type: number
+          minimum: 1
+          example: 64
+        gender:
+          type: string
+          enum: [MALE, FEMALE]
+          example: FEMALE
+        activityLevel:
+          type: string
+          enum: [SEDENTARY, MODERATE, VERY_ACTIVE]
+          example: VERY_ACTIVE
+        goal:
+          type: string
+          enum: [LOSE_WEIGHT, MAINTAIN_WEIGHT, GAIN_WEIGHT]
+          example: LOSE_WEIGHT
+
+    Profile:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        userId:
+          type: integer
+          example: 1
+        gender:
+          type: string
+          enum: [MALE, FEMALE]
+          example: MALE
+        age:
+          type: integer
+          example: 25
+        weight:
+          type: number
+          example: 65
+        height:
+          type: number
+          example: 170
+        activityLevel:
+          type: string
+          enum: [SEDENTARY, MODERATE, VERY_ACTIVE]
+          example: MODERATE
+        goal:
+          type: string
+          example: MAINTAIN_WEIGHT
+        weightGoal:
+          type: number
+          nullable: true
+          example: 62
+        calorieGoal:
+          type: number
+          nullable: true
+          example: 2100
+        proteinGoal:
+          type: number
+          nullable: true
+          example: 120
+        carbGoal:
+          type: number
+          nullable: true
+          example: 250
+        fatGoal:
+          type: number
+          nullable: true
+          example: 60
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ProfileResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Profile retrieved successfully"
+        data:
+          $ref: "#/components/schemas/Profile"
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Bad request"
+        data:
+          nullable: true
+          example: null
