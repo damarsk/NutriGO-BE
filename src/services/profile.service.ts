@@ -23,6 +23,38 @@ export const getProfile = async (userId: number) => {
 };
 
 export const createProfile = async (userId: number, data: IUpdateProfile) => {
+  let bmr = 0;
+  let tdee = 0;
+  let calorieGoal = tdee;
+  let proteinGoal = data.weight * 2.2;
+  let fatGoal = (calorieGoal * 0.25) / 9;
+  let carbGoal = (calorieGoal - proteinGoal * 4 - fatGoal * 9) / 4;
+
+  if (data.gender === "MALE") {
+    bmr = 10 * data.weight + 6.25 * data.height - 5 * data.age + 5;
+  } else {
+    bmr = 10 * data.weight + 6.25 * data.height - 5 * data.age - 161;
+  }
+
+  if (data.activityLevel === "SEDENTARY") {
+    tdee = bmr * 1.2;
+  } else if (data.activityLevel === "MODERATE") {
+    tdee = bmr * 1.55;
+  } else if (data.activityLevel === "VERY_ACTIVE") {
+    tdee = bmr * 1.725;
+  }
+
+  if (data.goal === "BULKING") {
+    calorieGoal += 500;
+  } else if (data.goal === "CUTTING") {
+    calorieGoal -= 500;
+  }
+
+  calorieGoal = Math.round(calorieGoal);
+  proteinGoal = Math.round(proteinGoal);
+  fatGoal = Math.round(fatGoal);
+  carbGoal = Math.round(carbGoal);
+
   return await prisma.profile.create({
     data: {
       userId: userId,
@@ -33,6 +65,10 @@ export const createProfile = async (userId: number, data: IUpdateProfile) => {
       activityLevel: data.activityLevel,
       goal: data.goal,
       weightGoal: data.weightGoal,
+      calorieGoal: calorieGoal,
+      proteinGoal: proteinGoal,
+      fatGoal: fatGoal,
+      carbGoal: carbGoal,
     },
   });
 };
