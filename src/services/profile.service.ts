@@ -79,10 +79,7 @@ export const updateProfile = async (userId: number, data: IUpdateProfile) => {
   return await prisma.profile.update({
     where: { userId: userId },
     data: {
-      age: data.age,
-      height: data.height,
-      weight: data.weight,
-      activityLevel: data.activityLevel,
+      ...data,
     },
   });
 };

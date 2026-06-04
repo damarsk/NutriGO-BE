@@ -1,6 +1,6 @@
 import { prisma } from "../config/prisma";
 
-interface ICreateFood {
+interface IFood {
   name: string;
   calories?: number | null;
   carbs?: number | null;
@@ -13,15 +13,25 @@ export const getAllFoods = async () => {
   return await prisma.food.findMany();
 };
 
-export const createFood = async (data: ICreateFood) => {
+export const createFood = async (data: IFood) => {
   return await prisma.food.create({
     data: {
-      name: data.name,
-      calories: data.calories || null,
-      carbs: data.carbs || null,
-      fat: data.fat || null,
-      sugar: data.sugar || null,
-      natrium: data.natrium || null,
+      ...data,
     },
+  });
+};
+
+export const updateFood = async (id: number, data: IFood) => {
+  return await prisma.food.update({
+    where: { id },
+    data: {
+      ...data,
+    },
+  });
+};
+
+export const deleteFood = async (id: number) => {
+  return await prisma.food.delete({
+    where: { id },
   });
 };

@@ -151,6 +151,75 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /api/foods/{id}:
+    put:
+      tags: [Food]
+      summary: Update a food by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateFoodRequest"
+      responses:
+        200:
+          description: Food updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FoodResponse"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      tags: [Food]
+      summary: Delete a food by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Food deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FoodResponse"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   # ================= PROFILE =================
 
   /api/profile:
@@ -322,7 +391,38 @@ components:
 
     CreateFoodRequest:
       type: object
-      required: [name, calories, carbs, fat, sugar, natrium]
+      required: [name]
+      properties:
+        name:
+          type: string
+          example: "Apple"
+        calories:
+          type: number
+          nullable: true
+          example: 52
+        carbs:
+          type: number
+          nullable: true
+          example: 14
+        fat:
+          type: number
+          nullable: true
+          example: 0.2
+        protein:
+          type: number
+          nullable: true
+          example: 0.3
+        sugar:
+          type: number
+          nullable: true
+          example: 10
+        natrium:
+          type: number
+          nullable: true
+          example: 1
+
+    UpdateFoodRequest:
+      type: object
       properties:
         name:
           type: string
