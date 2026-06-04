@@ -67,13 +67,13 @@ model Profile {
 
 model Food {
     id        Int      @id @default(autoincrement())
-    name      String
-    calories  Decimal
-    protein   Decimal
-    carbs     Decimal
-    fat       Decimal
-    sugar     Decimal
-    natrium   Decimal
+    name      String    @unique
+    calories  Decimal?
+    protein   Decimal?
+    carbs     Decimal?
+    fat       Decimal?
+    sugar     Decimal?
+    natrium   Decimal?
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     dailyLogs DailyLog[]
