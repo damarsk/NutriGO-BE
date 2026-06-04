@@ -8,7 +8,7 @@ export const createProfileSchema = z.object({
   activityLevel: z.enum(["SEDENTARY", "MODERATE", "VERY_ACTIVE"], {
     error: "Invalid activity level",
   }),
-  goal: z.enum(["LOSE_WEIGHT", "MAINTAIN_WEIGHT", "GAIN_WEIGHT"], {
+  goal: z.enum(["BULKING", "CUTTING", "MAINTAINING"], {
     error: "Invalid goal",
   }),
   weightGoal: z
@@ -36,7 +36,7 @@ export const updateProfileSchema = z.object({
     })
     .optional(),
   goal: z
-    .enum(["LOSE_WEIGHT", "MAINTAIN_WEIGHT", "GAIN_WEIGHT"], {
+    .enum(["BULKING", "CUTTING", "MAINTAINING"], {
       error: "Invalid goal",
     })
     .optional(),
