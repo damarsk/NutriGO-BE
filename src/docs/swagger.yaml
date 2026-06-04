@@ -13,6 +13,7 @@ servers:
 tags:
   - name: Auth
   - name: Food
+  - name: DailyLog
   - name: Profile
 
 paths:
@@ -209,6 +210,74 @@ paths:
                 $ref: "#/components/schemas/FoodResponse"
         400:
           description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ================= DAILYLOG =================
+
+  /api/dailylogs:
+    post:
+      tags: [DailyLog]
+      summary: Create a daily log entry
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDailyLogRequest"
+      responses:
+        201:
+          description: Log created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DailyLogResponse"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/dailylogs/{date}:
+    get:
+      tags: [DailyLog]
+      summary: Get daily logs by date
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: date
+          in: path
+          required: true
+          description: Date in ISO format (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+      responses:
+        200:
+          description: Logs retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DailyLogListResponse"
+        400:
+          description: Failed to retrieve logs
           content:
             application/json:
               schema:
@@ -452,31 +521,83 @@ components:
           nullable: true
           example: 1
 
-    Food:
+    CreateDailyLogRequest:
+      type: object
+      required: [foodId, date, mealTime, consumtionGram, totalCalories, totalProtein, totalCarbs, totalFat, totalSugar, totalNatrium]
+      properties:
+        foodId:
+          type: integer
+          example: 1
+        date:
+          type: string
+          format: date-time
+          example: "2026-06-05T00:00:00Z"
+        mealTime:
+          type: string
+          enum: [BREAKFAST, LUNCH, DINNER, SNACK]
+          example: BREAKFAST
+        consumtionGram:
+          type: number
+          example: 100
+        totalCalories:
+          type: number
+          example: 52
+        totalProtein:
+          type: number
+          example: 0.3
+        totalCarbs:
+          type: number
+          example: 14
+        totalFat:
+          type: number
+          example: 0.2
+        totalSugar:
+          type: number
+          example: 10
+        totalNatrium:
+          type: number
+          example: 1
+
+    DailyLog:
       type: object
       properties:
         id:
           type: integer
-        name:
+          example: 1
+        userId:
+          type: integer
+          example: 1
+        foodId:
+          type: integer
+          example: 1
+        date:
           type: string
-        calories:
+          format: date-time
+        mealTime:
+          type: string
+          enum: [BREAKFAST, LUNCH, DINNER, SNACK]
+          example: BREAKFAST
+        consumtionGram:
           type: number
-          nullable: true
-        carbs:
+          example: 100
+        totalCalories:
           type: number
-          nullable: true
-        fat:
+          example: 52
+        totalProtein:
           type: number
-          nullable: true
-        protein:
+          example: 0.3
+        totalCarbs:
           type: number
-          nullable: true
-        sugar:
+          example: 14
+        totalFat:
           type: number
-          nullable: true
-        natrium:
+          example: 0.2
+        totalSugar:
           type: number
-          nullable: true
+          example: 10
+        totalNatrium:
+          type: number
+          example: 1
         createdAt:
           type: string
           format: date-time
@@ -484,25 +605,25 @@ components:
           type: string
           format: date-time
 
-    FoodResponse:
+    DailyLogResponse:
       type: object
       properties:
         message:
           type: string
-          example: "Food created successfully"
+          example: "Log created successfully"
         data:
-          $ref: "#/components/schemas/Food"
+          $ref: "#/components/schemas/DailyLog"
 
-    FoodListResponse:
+    DailyLogListResponse:
       type: object
       properties:
         message:
           type: string
-          example: "Foods retrieved successfully"
+          example: "Logs retrieved successfully"
         data:
           type: array
           items:
-            $ref: "#/components/schemas/Food"
+            $ref: "#/components/schemas/DailyLog"
 
     CreateProfileRequest:
       type: object

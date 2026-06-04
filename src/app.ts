@@ -3,6 +3,7 @@ import cors from "cors";
 import authRoutes from "./routes/auth.route";
 import foodRoutes from "./routes/food.route";
 import profileRoutes from "./routes/profile.route";
+import dailylogRoutes from "./routes/dailylog.route";
 import { errorHandler } from "./middlewares/error.middleware";
 import { swaggerDocs } from "./docs/swagger";
 
@@ -30,6 +31,7 @@ app.get("/", (req: express.Request, res: express.Response) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/foods", foodRoutes);
 app.use("/api/profile", profileRoutes);
+app.use("/api/dailylogs", dailylogRoutes);
 
 app.use(errorHandler);
 
