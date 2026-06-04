@@ -25,10 +25,7 @@ export const getProfile = async (userId: number) => {
 export const createProfile = async (userId: number, data: IUpdateProfile) => {
   let bmr = 0;
   let tdee = 0;
-  let calorieGoal = tdee;
-  let proteinGoal = data.weight * 2.2;
-  let fatGoal = (calorieGoal * 0.25) / 9;
-  let carbGoal = (calorieGoal - proteinGoal * 4 - fatGoal * 9) / 4;
+  let calorieGoal = 0;
 
   if (data.gender === "MALE") {
     bmr = 10 * data.weight + 6.25 * data.height - 5 * data.age + 5;
@@ -44,11 +41,16 @@ export const createProfile = async (userId: number, data: IUpdateProfile) => {
     tdee = bmr * 1.725;
   }
 
+  calorieGoal = tdee;
   if (data.goal === "BULKING") {
     calorieGoal += 500;
   } else if (data.goal === "CUTTING") {
     calorieGoal -= 500;
   }
+
+  let proteinGoal = data.weight * 2.2;
+  let fatGoal = (calorieGoal * 0.25) / 9;
+  let carbGoal = (calorieGoal - proteinGoal * 4 - fatGoal * 9) / 4;
 
   calorieGoal = Math.round(calorieGoal);
   proteinGoal = Math.round(proteinGoal);
