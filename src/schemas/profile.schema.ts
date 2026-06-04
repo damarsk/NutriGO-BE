@@ -11,6 +11,9 @@ export const createProfileSchema = z.object({
   goal: z.enum(["LOSE_WEIGHT", "MAINTAIN_WEIGHT", "GAIN_WEIGHT"], {
     error: "Invalid goal",
   }),
+  weightGoal: z
+    .number({ error: "Weight goal must be a positive number" })
+    .positive(),
 });
 export const updateProfileSchema = z.object({
   age: z

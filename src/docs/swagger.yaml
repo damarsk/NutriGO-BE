@@ -406,7 +406,7 @@ components:
 
     CreateProfileRequest:
       type: object
-      required: [age, height, weight, gender, activityLevel, goal]
+      required: [age, height, weight, gender, activityLevel, goal, weightGoal]
       properties:
         age:
           type: integer
@@ -432,6 +432,10 @@ components:
           type: string
           enum: [LOSE_WEIGHT, MAINTAIN_WEIGHT, GAIN_WEIGHT]
           example: MAINTAIN_WEIGHT
+        weightGoal:
+          type: number
+          minimum: 1
+          example: 62
 
     UpdateProfileRequest:
       type: object
