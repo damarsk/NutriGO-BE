@@ -7,11 +7,11 @@ interface ICreateLog {
   mealTime: "BREAKFAST" | "LUNCH" | "DINNER" | "SNACK";
   consumtionGram: number;
   totalCalories: number;
-  totalProtein: number;
-  totalCarbs: number;
-  totalFat: number;
-  totalSugar: number;
-  totalNatrium: number;
+  totalProtein?: number;
+  totalCarbs?: number;
+  totalFat?: number;
+  totalSugar?: number;
+  totalNatrium?: number;
 }
 
 export const createLog = async (data: ICreateLog) => {
@@ -40,6 +40,13 @@ export const getLogsByUserIdAndDate = async (userId: number, date: string) => {
         lte: endOfDay,
       },
     },
+    include: {
+      food: {
+        select: {
+          name: true,
+        }
+      }
+    }
   });
 
   return logs;

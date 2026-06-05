@@ -13,11 +13,11 @@ interface ICreateLog {
   mealTime: "BREAKFAST" | "LUNCH" | "DINNER" | "SNACK";
   consumtionGram: number;
   totalCalories: number;
-  totalProtein: number;
-  totalCarbs: number;
-  totalFat: number;
-  totalSugar: number;
-  totalNatrium: number;
+  totalProtein?: number;
+  totalCarbs?: number;
+  totalFat?: number;
+  totalSugar?: number;
+  totalNatrium?: number;
 }
 
 export const createLog = async (req: Request, res: Response) => {
