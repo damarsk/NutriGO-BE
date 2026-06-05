@@ -26,6 +26,6 @@ router.delete(
   "/:id",
   verifyToken,
   requireRole(["ADMIN"]),
-  controller.createFood,
+  controller.deleteFood,
 );
 export default router;
