@@ -44,3 +44,17 @@ export const getLogsByUserIdAndDate = async (userId: number, date: string) => {
 
   return logs;
 };
+
+export const deleteLogById = async (logId: number, userId: number) => {
+  const log = await prisma.dailyLog.findUnique({
+    where: { id: logId },
+  });
+
+  if (!log || log.userId !== userId) {
+    throw new Error("Log not found or unauthorized");
+  }
+
+  return await prisma.dailyLog.delete({
+    where: { id: logId, userId },
+  });
+};

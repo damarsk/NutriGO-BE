@@ -289,6 +289,38 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /api/dailylogs/{id}:
+    delete:
+      tags: [DailyLog]
+      summary: Delete a daily log by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Log deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DailyLogResponse"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   # ================= PROFILE =================
 
   /api/profile:
@@ -523,7 +555,19 @@ components:
 
     CreateDailyLogRequest:
       type: object
-      required: [foodId, date, mealTime, consumtionGram, totalCalories, totalProtein, totalCarbs, totalFat, totalSugar, totalNatrium]
+      required:
+        [
+          foodId,
+          date,
+          mealTime,
+          consumtionGram,
+          totalCalories,
+          totalProtein,
+          totalCarbs,
+          totalFat,
+          totalSugar,
+          totalNatrium,
+        ]
       properties:
         foodId:
           type: integer

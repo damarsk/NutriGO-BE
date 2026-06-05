@@ -8,5 +8,6 @@ const router = Router();
 
 router.post("/", verifyToken, validate(createLog), controller.createLog);
 router.get("/:date", verifyToken, controller.getLogByDate);
+router.delete("/:id", verifyToken, controller.deleteLogById);
 
 export default router;

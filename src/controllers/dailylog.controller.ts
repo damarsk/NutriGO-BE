@@ -58,3 +58,23 @@ export const getLogByDate = async (
       .json({ message: err.message || "Failed to retrieve logs", data: null });
   }
 };
+
+export const deleteLogById = async (
+  req: AuthenticatedRequest,
+  res: Response,
+) => {
+  try {
+    const log = await service.deleteLogById(
+      Number(req.params.id),
+      req.user!.id,
+    );
+    res.status(200).json({
+      message: "Log deleted successfully",
+      data: log,
+    });
+  } catch (err: any) {
+    res
+      .status(400)
+      .json({ message: err.message || "Failed to delete log", data: null });
+  }
+};
