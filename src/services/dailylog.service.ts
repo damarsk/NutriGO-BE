@@ -40,6 +40,13 @@ export const getLogsByUserIdAndDate = async (userId: number, date: string) => {
         lte: endOfDay,
       },
     },
+    include: {
+      food: {
+        select: {
+          name: true,
+        }
+      }
+    }
   });
 
   return logs;
