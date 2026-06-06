@@ -10,12 +10,6 @@ interface IUpdateProfile {
   weightGoal: number;
 }
 
-interface User {
-  id: number;
-  fullName: string;
-  role: string;
-}
-
 export const getProfile = async (userId: number) => {
   return await prisma.profile.findUnique({
     where: { userId: userId },
@@ -76,10 +70,49 @@ export const createProfile = async (userId: number, data: IUpdateProfile) => {
 };
 
 export const updateProfile = async (userId: number, data: IUpdateProfile) => {
+  let bmr = 0;
+  let tdee = 0;
+  let calorieGoal = 0;
+
+  if (data.gender === "MALE") {
+    bmr = 10 * data.weight + 6.25 * data.height - 5 * data.age + 5;
+  } else {
+    bmr = 10 * data.weight + 6.25 * data.height - 5 * data.age - 161;
+  }
+
+  if (data.activityLevel === "SEDENTARY") {
+    tdee = bmr * 1.2;
+  } else if (data.activityLevel === "MODERATE") {
+    tdee = bmr * 1.55;
+  } else if (data.activityLevel === "VERY_ACTIVE") {
+    tdee = bmr * 1.725;
+  }
+
+  calorieGoal = tdee;
+  if (data.goal === "BULKING") {
+    calorieGoal += 500;
+  } else if (data.goal === "CUTTING") {
+    calorieGoal -= 500;
+  }
+
+  let proteinGoal = data.weight * 2.2;
+  let fatGoal = (calorieGoal * 0.25) / 9;
+  let carbGoal = (calorieGoal - proteinGoal * 4 - fatGoal * 9) / 4;
+
+  calorieGoal = Math.round(calorieGoal);
+  proteinGoal = Math.round(proteinGoal);
+  fatGoal = Math.round(fatGoal);
+  carbGoal = Math.round(carbGoal);
   return await prisma.profile.update({
     where: { userId: userId },
     data: {
-      ...data,
+      age: data.age,
+      height: data.height,
+      weight: data.weight,
+      gender: data.gender,
+      activityLevel: data.activityLevel,
+      goal: data.goal,
+      weightGoal: data.weightGoal,
     },
   });
 };

@@ -40,4 +40,8 @@ export const updateProfileSchema = z.object({
       error: "Invalid goal",
     })
     .optional(),
+  weightGoal: z
+    .number({ error: "Weight goal must be a positive number" })
+    .positive()
+    .optional(),
 });
