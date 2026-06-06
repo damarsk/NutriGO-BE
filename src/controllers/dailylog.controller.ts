@@ -59,6 +59,28 @@ export const getLogByDate = async (
   }
 };
 
+export const updateLogById = async (
+  req: AuthenticatedRequest,
+  res: Response,
+) => {
+  const logId = Number(req.params.id);
+  try {
+    const log = await service.updateLogById(
+      logId,
+      req.user!.id,
+      req.body as { consumtionGram: number },
+    );
+    res.status(200).json({
+      message: "Log updated successfully",
+      data: log,
+    });
+  } catch (err: any) {
+    res
+      .status(400)
+      .json({ message: err.message || "Failed to update log", data: null });
+  }
+};
+
 export const deleteLogById = async (
   req: AuthenticatedRequest,
   res: Response,

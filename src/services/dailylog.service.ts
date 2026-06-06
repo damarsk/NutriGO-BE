@@ -19,6 +19,11 @@ export const createLog = async (data: ICreateLog) => {
     data: {
       ...data,
       date: new Date(data.date),
+      totalProtein: data.totalProtein ?? 0,
+      totalCarbs: data.totalCarbs ?? 0,
+      totalFat: data.totalFat ?? 0,
+      totalSugar: data.totalSugar ?? 0,
+      totalNatrium: data.totalNatrium ?? 0,
     },
   });
 
@@ -44,12 +49,33 @@ export const getLogsByUserIdAndDate = async (userId: number, date: string) => {
       food: {
         select: {
           name: true,
-        }
-      }
-    }
+        },
+      },
+    },
   });
 
   return logs;
+};
+
+export const updateLogById = async (
+  logId: number,
+  userId: number,
+  data: { consumtionGram: number },
+) => {
+  const log = await prisma.dailyLog.findUnique({
+    where: { id: logId },
+  });
+
+  if (!log || log.userId !== userId) {
+    throw new Error("Log not found or unauthorized");
+  }
+
+  return await prisma.dailyLog.update({
+    where: { id: logId },
+    data: {
+      consumtionGram: data.consumtionGram,
+    },
+  });
 };
 
 export const deleteLogById = async (logId: number, userId: number) => {

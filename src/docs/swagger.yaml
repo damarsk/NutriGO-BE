@@ -320,6 +320,42 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      tags: [DailyLog]
+      summary: Update a daily log by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDailyLogRequest"
+      responses:
+        200:
+          description: Log updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DailyLogResponse"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   # ================= PROFILE =================
 
@@ -657,6 +693,15 @@ components:
           example: "Log created successfully"
         data:
           $ref: "#/components/schemas/DailyLog"
+
+    UpdateDailyLogRequest:
+      type: object
+      required:
+        - consumtionGram
+      properties:
+        consumtionGram:
+          type: number
+          example: 150
 
     DailyLogListResponse:
       type: object
