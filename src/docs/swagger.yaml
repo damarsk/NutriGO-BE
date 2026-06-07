@@ -17,8 +17,6 @@ tags:
   - name: Profile
 
 paths:
-  # ================= AUTH =================
-
   /api/auth/register:
     post:
       tags: [Auth]
@@ -37,11 +35,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/AuthTokenResponse"
         400:
-          description: Bad request
+          description: Bad request or validation error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                oneOf:
+                  - $ref: "#/components/schemas/ErrorResponse"
+                  - $ref: "#/components/schemas/ValidationErrorResponse"
 
   /api/auth/login:
     post:
@@ -61,11 +61,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/AuthTokenResponse"
         400:
-          description: Bad request
+          description: Bad request or validation error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                oneOf:
+                  - $ref: "#/components/schemas/ErrorResponse"
+                  - $ref: "#/components/schemas/ValidationErrorResponse"
 
   /api/auth/me:
     get:
@@ -92,8 +94,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-
-  # ================= FOOD =================
 
   /api/foods:
     get:
@@ -124,6 +124,7 @@ paths:
     post:
       tags: [Food]
       summary: Create a new food
+      description: Admin-only endpoint.
       security:
         - bearerAuth: []
       requestBody:
@@ -131,7 +132,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateFoodRequest"
+              $ref: "#/components/schemas/FoodUpsertRequest"
       responses:
         201:
           description: Food created successfully
@@ -140,13 +141,21 @@ paths:
               schema:
                 $ref: "#/components/schemas/FoodResponse"
         400:
-          description: Bad request
+          description: Bad request or validation error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/ErrorResponse"
+                  - $ref: "#/components/schemas/ValidationErrorResponse"
+        401:
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        401:
-          description: Unauthorized
+        403:
+          description: Forbidden
           content:
             application/json:
               schema:
@@ -156,6 +165,7 @@ paths:
     put:
       tags: [Food]
       summary: Update a food by ID
+      description: Admin-only endpoint.
       security:
         - bearerAuth: []
       parameters:
@@ -169,7 +179,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateFoodRequest"
+              $ref: "#/components/schemas/FoodUpsertRequest"
       responses:
         200:
           description: Food updated successfully
@@ -178,13 +188,21 @@ paths:
               schema:
                 $ref: "#/components/schemas/FoodResponse"
         400:
-          description: Bad request
+          description: Bad request or validation error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/ErrorResponse"
+                  - $ref: "#/components/schemas/ValidationErrorResponse"
+        401:
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        401:
-          description: Unauthorized
+        403:
+          description: Forbidden
           content:
             application/json:
               schema:
@@ -193,6 +211,7 @@ paths:
     delete:
       tags: [Food]
       summary: Delete a food by ID
+      description: Admin-only endpoint.
       security:
         - bearerAuth: []
       parameters:
@@ -220,8 +239,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-
-  # ================= DAILYLOG =================
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/dailylogs:
     post:
@@ -243,11 +266,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/DailyLogResponse"
         400:
-          description: Bad request
+          description: Bad request or validation error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                oneOf:
+                  - $ref: "#/components/schemas/ErrorResponse"
+                  - $ref: "#/components/schemas/ValidationErrorResponse"
         401:
           description: Unauthorized
           content:
@@ -290,6 +315,45 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
 
   /api/dailylogs/{id}:
+    patch:
+      tags: [DailyLog]
+      summary: Update a daily log by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDailyLogRequest"
+      responses:
+        200:
+          description: Log updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DailyLogResponse"
+        400:
+          description: Bad request or validation error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/ErrorResponse"
+                  - $ref: "#/components/schemas/ValidationErrorResponse"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
     delete:
       tags: [DailyLog]
       summary: Delete a daily log by ID
@@ -320,44 +384,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-    patch:
-      tags: [DailyLog]
-      summary: Update a daily log by ID
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateDailyLogRequest"
-      responses:
-        200:
-          description: Log updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/DailyLogResponse"
-        400:
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        401:
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-
-  # ================= PROFILE =================
 
   /api/profile:
     get:
@@ -404,11 +430,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProfileResponse"
         400:
-          description: Bad request
+          description: Bad request or validation error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                oneOf:
+                  - $ref: "#/components/schemas/ErrorResponse"
+                  - $ref: "#/components/schemas/ValidationErrorResponse"
         401:
           description: Unauthorized
           content:
@@ -435,11 +463,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProfileResponse"
         400:
-          description: Bad request
+          description: Bad request or validation error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                oneOf:
+                  - $ref: "#/components/schemas/ErrorResponse"
+                  - $ref: "#/components/schemas/ValidationErrorResponse"
         401:
           description: Unauthorized
           content:
@@ -461,7 +491,7 @@ components:
       properties:
         fullName:
           type: string
-          example: "John Doe"
+          example: John Doe
         email:
           type: string
           format: email
@@ -504,7 +534,7 @@ components:
       properties:
         token:
           type: string
-          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         user:
           $ref: "#/components/schemas/AuthUser"
 
@@ -513,7 +543,7 @@ components:
       properties:
         message:
           type: string
-          example: "Login successful"
+          example: Login successful
         data:
           $ref: "#/components/schemas/AuthTokenData"
 
@@ -522,21 +552,25 @@ components:
       properties:
         message:
           type: string
-          example: "User info fetched successfully"
+          example: User info fetched successfully
         data:
           $ref: "#/components/schemas/AuthUser"
 
-    CreateFoodRequest:
+    FoodUpsertRequest:
       type: object
-      required: [name]
+      required: [name, calories, protein, carbs, fat, sugar, natrium]
       properties:
         name:
           type: string
-          example: "Apple"
+          example: Apple
         calories:
           type: number
           nullable: true
           example: 52
+        protein:
+          type: number
+          nullable: true
+          example: 0.3
         carbs:
           type: number
           nullable: true
@@ -545,10 +579,6 @@ components:
           type: number
           nullable: true
           example: 0.2
-        protein:
-          type: number
-          nullable: true
-          example: 0.3
         sugar:
           type: number
           nullable: true
@@ -558,16 +588,23 @@ components:
           nullable: true
           example: 1
 
-    UpdateFoodRequest:
+    Food:
       type: object
       properties:
+        id:
+          type: integer
+          example: 1
         name:
           type: string
-          example: "Apple"
+          example: Apple
         calories:
           type: number
           nullable: true
           example: 52
+        protein:
+          type: number
+          nullable: true
+          example: 0.3
         carbs:
           type: number
           nullable: true
@@ -576,10 +613,6 @@ components:
           type: number
           nullable: true
           example: 0.2
-        protein:
-          type: number
-          nullable: true
-          example: 0.3
         sugar:
           type: number
           nullable: true
@@ -588,22 +621,36 @@ components:
           type: number
           nullable: true
           example: 1
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    FoodResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Food created successfully
+        data:
+          $ref: "#/components/schemas/Food"
+
+    FoodListResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Foods retrieved successfully
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Food"
 
     CreateDailyLogRequest:
       type: object
-      required:
-        [
-          foodId,
-          date,
-          mealTime,
-          consumtionGram,
-          totalCalories,
-          totalProtein,
-          totalCarbs,
-          totalFat,
-          totalSugar,
-          totalNatrium,
-        ]
+      required: [foodId, date, mealTime, consumtionGram, totalCalories]
       properties:
         foodId:
           type: integer
@@ -611,7 +658,7 @@ components:
         date:
           type: string
           format: date-time
-          example: "2026-06-05T00:00:00Z"
+          example: 2026-06-05T00:00:00Z
         mealTime:
           type: string
           enum: [BREAKFAST, LUNCH, DINNER, SNACK]
@@ -624,18 +671,23 @@ components:
           example: 52
         totalProtein:
           type: number
+          nullable: true
           example: 0.3
         totalCarbs:
           type: number
+          nullable: true
           example: 14
         totalFat:
           type: number
+          nullable: true
           example: 0.2
         totalSugar:
           type: number
+          nullable: true
           example: 10
         totalNatrium:
           type: number
+          nullable: true
           example: 1
 
     DailyLog:
@@ -665,18 +717,23 @@ components:
           example: 52
         totalProtein:
           type: number
+          nullable: true
           example: 0.3
         totalCarbs:
           type: number
+          nullable: true
           example: 14
         totalFat:
           type: number
+          nullable: true
           example: 0.2
         totalSugar:
           type: number
+          nullable: true
           example: 10
         totalNatrium:
           type: number
+          nullable: true
           example: 1
         createdAt:
           type: string
@@ -685,19 +742,34 @@ components:
           type: string
           format: date-time
 
+    DailyLogFood:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Apple
+
+    DailyLogWithFood:
+      allOf:
+        - $ref: "#/components/schemas/DailyLog"
+        - type: object
+          properties:
+            food:
+              $ref: "#/components/schemas/DailyLogFood"
+
     DailyLogResponse:
       type: object
       properties:
         message:
           type: string
-          example: "Log created successfully"
+          example: Log created successfully
         data:
           $ref: "#/components/schemas/DailyLog"
 
     UpdateDailyLogRequest:
       type: object
       required:
-        - consumtionGram
+        [consumtionGram, totalCalories, totalProtein, totalCarbs, totalFat]
       properties:
         consumtionGram:
           type: number
@@ -720,11 +792,11 @@ components:
       properties:
         message:
           type: string
-          example: "Logs retrieved successfully"
+          example: Logs retrieved successfully
         data:
           type: array
           items:
-            $ref: "#/components/schemas/DailyLog"
+            $ref: "#/components/schemas/DailyLogWithFood"
 
     CreateProfileRequest:
       type: object
@@ -752,8 +824,8 @@ components:
           example: MODERATE
         goal:
           type: string
-          enum: [LOSE_WEIGHT, MAINTAIN_WEIGHT, GAIN_WEIGHT]
-          example: MAINTAIN_WEIGHT
+          enum: [BULKING, CUTTING, MAINTAINING]
+          example: MAINTAINING
         weightGoal:
           type: number
           minimum: 1
@@ -784,8 +856,12 @@ components:
           example: VERY_ACTIVE
         goal:
           type: string
-          enum: [LOSE_WEIGHT, MAINTAIN_WEIGHT, GAIN_WEIGHT]
-          example: LOSE_WEIGHT
+          enum: [BULKING, CUTTING, MAINTAINING]
+          example: BULKING
+        weightGoal:
+          type: number
+          minimum: 1
+          example: 62
 
     Profile:
       type: object
@@ -815,7 +891,8 @@ components:
           example: MODERATE
         goal:
           type: string
-          example: MAINTAIN_WEIGHT
+          enum: [BULKING, CUTTING, MAINTAINING]
+          example: MAINTAINING
         weightGoal:
           type: number
           nullable: true
@@ -848,16 +925,37 @@ components:
       properties:
         message:
           type: string
-          example: "Profile retrieved successfully"
+          example: Profile retrieved successfully
         data:
           $ref: "#/components/schemas/Profile"
+
+    ValidationErrorItem:
+      type: object
+      properties:
+        field:
+          type: string
+          example: email
+        message:
+          type: string
+          example: Invalid email address
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Validation failed
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValidationErrorItem"
 
     ErrorResponse:
       type: object
       properties:
         message:
           type: string
-          example: "Bad request"
+          example: Bad request
         data:
           nullable: true
           example: null
