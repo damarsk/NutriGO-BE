@@ -14,6 +14,14 @@ interface ICreateLog {
   totalNatrium?: number;
 }
 
+interface IUpdateLog {
+  consumtionGram: number;
+  totalCalories: number;
+  totalProtein: number;
+  totalCarbs: number;
+  totalFat: number;
+}
+
 export const createLog = async (data: ICreateLog) => {
   const log = await prisma.dailyLog.create({
     data: {
@@ -60,7 +68,7 @@ export const getLogsByUserIdAndDate = async (userId: number, date: string) => {
 export const updateLogById = async (
   logId: number,
   userId: number,
-  data: { consumtionGram: number },
+  data: IUpdateLog,
 ) => {
   const log = await prisma.dailyLog.findUnique({
     where: { id: logId },
@@ -73,7 +81,7 @@ export const updateLogById = async (
   return await prisma.dailyLog.update({
     where: { id: logId },
     data: {
-      consumtionGram: data.consumtionGram,
+      ...data,
     },
   });
 };

@@ -20,6 +20,14 @@ interface ICreateLog {
   totalNatrium?: number;
 }
 
+interface IUpdateLog {
+  consumtionGram: number;
+  totalCalories: number;
+  totalProtein: number;
+  totalCarbs: number;
+  totalFat: number;
+}
+
 export const createLog = async (req: Request, res: Response) => {
   try {
     const authReq = req as AuthenticatedRequest;
@@ -68,7 +76,7 @@ export const updateLogById = async (
     const log = await service.updateLogById(
       logId,
       req.user!.id,
-      req.body as { consumtionGram: number },
+      req.body as IUpdateLog,
     );
     res.status(200).json({
       message: "Log updated successfully",

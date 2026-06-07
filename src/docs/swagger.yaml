@@ -702,6 +702,18 @@ components:
         consumtionGram:
           type: number
           example: 150
+        totalCalories:
+          type: number
+          example: 78
+        totalProtein:
+          type: number
+          example: 0.45
+        totalCarbs:
+          type: number
+          example: 21
+        totalFat:
+          type: number
+          example: 0.3
 
     DailyLogListResponse:
       type: object
